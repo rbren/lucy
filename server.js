@@ -30,9 +30,33 @@ var PACKAGE_LIST = [
 
 app.get("*", function(req, res) {
   console.log('get!' + req.url);
+  var versions = [];
+  for (var i = 0; i < PACKAGE_LIST.length; ++i) {
+    var name = PACKAGE_LIST[i];
+    REQUEST.get("http://search.maven.org/solrsearch/select?a=" + name + "&q=" + name, function(err, searchResp, body) {
+      body = JSON.parse(body);
+      var results = body["response"]["docs"];
+      var name = body["responseHeader"]["params"]["a"];
+      console.log("got res");
+      for (var j = 0; j < results.length; ++j) {
+        console.log("found a:" + results[j]["a"]);
+        if (results[j]["a"] === name) {
+          versions[versions.length] = {
+              artifact: results[j]["a"],
+              latestVersion: results[j]["latestVersion"],
+          };
+          break;
+        }
+      }
+      if (versions.length === PACKAGE_LIST.length) {
+        console.log('adding versions:' + versions.length);
+        res.render('deps', {versions: versions});
+      }
+    });
+  }
 });
 
-app.listen(5000);
+app.listen(3500);
 
 var sanitizePath = function(path) {
   // Get rid of weird chars
