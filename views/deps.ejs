@@ -1,0 +1,16 @@
+<html>
+  <head>
+    <title>Lucy</title>
+  </head>
+  <body>
+    Lucy!<br>
+    <div id="versions">
+<% for (var i = 0; i < versions.length; ++i) { %>
+      <div class="versionline">
+<%= versions[i]["artifact"] %> : + <%= versions[i]["latestVersion"] %> 
+      </div>
+<% } %>
+    </div>
+
+  </body>
+</html>
