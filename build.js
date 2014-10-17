@@ -1,8 +1,3 @@
-#!/usr/bin/env node
-
-var repoLoc = "https://github.com/bobby-brennan/hello-lucy.git";
-var destDir = 'lucy-tmp';
-
 var Repository = require('git-cli').Repository;
 var FS = require('fs');
 var EJS = require('ejs');
@@ -17,26 +12,22 @@ var ignoreFile = function(file) {
 var FILES_TO_RENDER = [];
 var FILES_RENDERED = [];
 
-var renderAllFiles = function(onDone) {
-  console.log("rendering:" + FILES_TO_RENDER.length);
+var renderAllFiles = function(config, dirPrefix, onDone) {
   for (var i = 0; i < FILES_TO_RENDER.length; ++i) {
     var oldFilename = FILES_TO_RENDER[i];
-    console.log('file:' + oldFilename);
-    var newFilename = oldFilename.substring(destDir.length + 1);
+    var newFilename = oldFilename.substring(dirPrefix.length);
     FS.readFile(oldFilename, 'utf8', function(err, data) {
       if (err) {
-        console.log('err:' + oldFilename + JSON.stringify(err));
+        console.log('error reading file:' + oldFilename);
         throw err;
       }
-      console.log('got data:' + data);
       var rendered = "";
       try {
-        rendered = EJS.render(data, {name: "Lucy"});
+        rendered = EJS.render(data, config);
       } catch (e) {
         throw "Failed to render!" + e;
       }
       FS.writeFile(newFilename, rendered, 'utf8', function() {
-        console.log("wrote file:" + newFilename);
         FILES_RENDERED.push(newFilename);
         if (FILES_TO_RENDER.length === FILES_RENDERED.length) {
           onDone();
@@ -46,17 +37,17 @@ var renderAllFiles = function(onDone) {
   }
 }
 
-var cloneAndRun = function() {
-  Repository.clone(repoLoc, destDir, function(err, repo) {
-    GLOB(destDir + '/**', {mark: true}, function(err, files) {
+var DEST_DIR = '.lucytmp';
+var cloneAndRun = function(repoLoc, config) {
+  Repository.clone(repoLoc, DEST_DIR, function(err, repo) {
+    GLOB(DEST_DIR + '/**', {mark: true}, function(err, files) {
       for (var i = 0; i < files.length; ++i) {
         if (!ignoreFile(files[i])) {
           FILES_TO_RENDER.push(files[i]);
         }
       }
-      renderAllFiles(function() {
-        console.log('deleting tmp dir');
-        recursiveRmdir(destDir);
+      renderAllFiles(config, DEST_DIR + '/', function() {
+        recursiveRmdir(DEST_DIR);
       });
     });
   });
@@ -80,17 +71,25 @@ var recursiveRmdir = function(dirName) {
   FS.rmdirSync(dirName);
 }
 
-var userArgs = process.argv.slice(2);
-console.log('args:' + JSON.stringify(userArgs));
-var command = userArgs[0].toLowerCase();
-var cmdArgs = userArgs.slice(1);
-if (!command) {
-  console.log('usage: lucy <cmd> <args>');
-  process.exit(1);
-} else if (command === 'build') {
-  require('./build.js').run(cmdArgs);
-} else if (command === 'publish') {
-  require('./publish.js').run(cmdArgs);
-} else {
-  console.log('unsupported command:' + command);
+exports.run = function(args) {
+  var repo = args[0];
+  var config = args[1];
+  if (!repo || !config) {
+    console.log('usage: lucy build <repo-url> <path-to-config-json>');
+    process.exit(1);
+  } else {
+    FS.readFile(config, 'utf8', function(err, data) {
+      if (err) {
+        console.log('error reading from config:' + config);
+        throw err;
+      }
+      try {
+        data = JSON.parse(data);
+      } catch (e) {
+        console.log('error parsing config JSON');
+        throw e;
+      }
+      cloneAndRun(repo, data);
+    });
+  }
 }
