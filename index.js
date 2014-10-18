@@ -81,7 +81,6 @@ var recursiveRmdir = function(dirName) {
 }
 
 var userArgs = process.argv.slice(2);
-console.log('args:' + JSON.stringify(userArgs));
 var command = userArgs[0].toLowerCase();
 var cmdArgs = userArgs.slice(1);
 if (!command) {
@@ -91,6 +90,8 @@ if (!command) {
   require('./build.js').run(cmdArgs);
 } else if (command === 'publish') {
   require('./publish.js').run(cmdArgs);
+} else if (command === 'adduser') {
+  require('./addUser.js').run(cmdArgs);
 } else {
   console.log('unsupported command:' + command);
 }
