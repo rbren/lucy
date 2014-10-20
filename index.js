@@ -23,14 +23,14 @@ if (!command) {
   process.exit(1);
 } else if (command === 'help') {
   showHelp();
-} else if (command === 'build') {
-  require('./build.js').run(cmdArgs);
-} else if (command === 'define') {
-  require('./define.js').run(cmdArgs);
-} else if (command === 'publish') {
-  require('./publish.js').run(cmdArgs);
-} else if (command === 'adduser') {
-  require('./addUser.js').run(cmdArgs);
+} else if (command === 'build' ||
+           command === 'define' ||
+           command === 'publish' ||
+           command === 'adduser') {
+  if (require('./' + command + '.js').run(cmdArgs)) {
+    console.log("returned error, showing help");
+    showHelp();
+  }
 } else {
   console.log('unsupported command:' + command);
 }

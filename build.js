@@ -3,7 +3,9 @@ var FS = require('fs');
 var EJS = require('ejs');
 var GLOB = require('glob');
 var PATH = require('path');
-var EXEC = require('exec');
+var EXEC = require('child_process').exec;
+var AUTH = require('./auth.js');
+var SERVER = require('./server.js');
 
 var ignoreFile = function(file) {
   return file.match('/$') || file.match('.*README.md');
@@ -38,7 +40,35 @@ var renderAllFiles = function(config, dirPrefix, onDone) {
 }
 
 var DEST_DIR = '.lucytmp';
-var cloneAndRun = function(repoLoc, config) {
+var TAR_FILENAME = DEST_DIR + '/package.tgz';
+var runForPackage = function(packageName, config) {
+  AUTH.login(function(email, password) {
+    var maybeHandleErr = function(err) {
+      //recursiveRmdir(DEST_DIR);
+      if (err) throw err;
+    }
+    FS.mkdir(DEST_DIR, function (err) {
+      maybeHandleErr(err);
+      SERVER.getPackage(email, password, packageName, function(err, data) {
+        maybeHandleErr(err);
+        console.log('got package!');
+        FS.writeFile(TAR_FILENAME, data, {encoding: 'binary'}, function (err) {
+           maybeHandleErr(err);
+          console.log('wrote tar');
+          EXEC('tar xzf ' + TAR_FILENAME, function(err, stdout, stderr) {
+            maybeHandleErr(err);
+            console.log('untarred');
+            renderAllFiles(config, DEST_DIR + '/', function() {
+              recursiveRmdir(DEST_DIR);
+            });
+          });
+        });
+      });
+    });
+  });
+}
+
+var runForRepo = function(repoLoc, config) {
   Repository.clone(repoLoc, DEST_DIR, function(err, repo) {
     GLOB(DEST_DIR + '/**', {mark: true}, function(err, files) {
       for (var i = 0; i < files.length; ++i) {
@@ -72,24 +102,39 @@ var recursiveRmdir = function(dirName) {
 }
 
 exports.run = function(args) {
-  var repo = args[0];
+  var source = args[0];
   var config = args[1];
-  if (!repo || !config) {
-    console.log('usage: lucy build <repo-url> <path-to-config-json>');
-    process.exit(1);
+  if (!source || !config) {
+    return true;
+  }
+  FS.readFile(config, 'utf8', function(err, data) {
+    if (err) {
+      console.log('error reading from config:' + config);
+      throw err;
+    }
+    try {
+      data = JSON.parse(data);
+    } catch (e) {
+      console.log('error parsing config JSON');
+      throw e;
+    }
+    if (runFromSource(source, data)) {
+      console.log('Couldn\'t parse source:' + source);
+    }
+  });
+}
+
+var runFromSource = function(source, config) {
+  if (source.lastIndexOf('.git') == source.length - 4) {
+    console.log('running from git repo:' + sourceStr);
+    runForRepo(source, data);
+  } else if (true) {
+    var colon = source.indexOf(':');
+    if (colon === -1) {
+      source += colon + source;
+    }
+    runForPackage(source, config);
   } else {
-    FS.readFile(config, 'utf8', function(err, data) {
-      if (err) {
-        console.log('error reading from config:' + config);
-        throw err;
-      }
-      try {
-        data = JSON.parse(data);
-      } catch (e) {
-        console.log('error parsing config JSON');
-        throw e;
-      }
-      cloneAndRun(repo, data);
-    });
+    return 1;
   }
 }
