@@ -13,26 +13,12 @@ var ignoreFile = function(file) {
 
 var FILES_TO_PROCESS = [];
 var FILES_PROCESSED = [];
-var DEST_DIR = '.lucytmp';
+var SRC_DIR = '/tmp/lucytmp';
+var DEP_SRC_DIR = '/dep';
+var DEST_DIR = process.cwd();
 
-var renderAllFiles = function(config, onDone) {
-  console.log('render and kill');
-  FILES_TO_PROCESS = [];
-  FILES_PROCESSED = [];
-  GLOB(DEST_DIR + '/**', {mark: true}, function(err, files) {
-      for (var i = 0; i < files.length; ++i) {
-        if (!ignoreFile(files[i])) {
-          var from  = files[i];
-          var to = from.substring(dirPrefix.length);
-          FILES_TO_PROCESS.push({from: from, to: to, method: 'render'});
-        }
-      }
-      processFilesInQueue(config, onDone); 
-  });
-}
-
-var renderAndCopyFiles = function(config, onDone) {
-  FS.readFile(DEST_DIR + '/package.json', function(err, data) {
+var getPackageDef = function(onDone) {
+  FS.readFile(SRC_DIR + '/package.json', function(err, data) {
     var packageDef = {};
     try {
       packageDef = JSON.parse(data);
@@ -40,25 +26,83 @@ var renderAndCopyFiles = function(config, onDone) {
       console.log('Error parsing package.json');
       throw e;
     }
-    if (!packageDef.files) {
-      console.log('No files to copy/render');
-      return onDone();
-    }
-    alterSourcePaths(packageDef.files);
-    FILES_TO_PROCESS = packageDef.files;
-    FILES_PROCESSED = [];
-    processFilesInQueue(config, onDone);
+    onDone(packageDef);
   });
 }
 
+var buildCode = function(packageDef, config, onDone) {
+  console.log('building code:' + packageDef.lucy_def);
+  buildDependencies(packageDef, config, function() {
+    console.log('++built deps')
+    renderAndCopyFiles(packageDef, config, function() {
+      console.log('++copied and rendered');
+      runJsScripts(packageDef, config, function() {
+        console.log('++ran JS scripts');
+        onDone();
+      });
+    });
+  });
+}
+
+var buildDependencies = function(packageDef, config, onDone) {
+  var deps = packageDef.dependencies;
+  if (!deps) {
+    return onDone();
+  }
+  var depKeys = Object.keys(deps);
+  if (!depKeys || depKeys.length === 0) {
+    return onDone();
+  }
+
+  var i = 0;
+  SRC_DIR += DEP_SRC_DIR;
+
+  var buildNextDependency = function() {
+    if (++i == depKeys.length) {
+      SRC_DIR = SRC_DIR.substring(0, SRC_DIR.length - DEP_SRC_DIR.length);
+      onDone();
+    } else {
+      buildDependency(depKeys, deps, i, buildNextDependency);
+    }
+  };
+
+  buildDependency(depKeys, deps, i, buildNextDependency);
+}
+
+var buildDependency = function(depKeys, deps, i, onDone) {
+  runForPackage(depKeys[i], deps[depKeys[i]], onDone); 
+}
+
+var runJsScripts = function(packageDef, config, onDone) {
+  var scripts = packageDef.js_scripts;
+  if (!scripts || scripts.length == 0) {
+    return onDone();
+  }
+  var i = -1;
+  var runNextScript = function(err) {
+    if (err) {throw err}
+    if (++i == scripts.length) {
+      return onDone();
+    }
+    var filename = SRC_DIR + '/' + packageDef.js_scripts[i];
+    require(filename).run({srcDir: SRC_DIR, destDir: DEST_DIR}, config, runNextScript);
+  }
+  runNextScript();
+}
+
+var renderAndCopyFiles = function(packageDef, config, onDone) {
+  alterSourcePaths(packageDef.files);
+  FILES_TO_PROCESS = packageDef.files;
+  FILES_PROCESSED = [];
+  processFilesInQueue(config, onDone);
+}
+
 var renderFile = function(map, config, onDone) {
-    console.log('rendering:' + JSON.stringify(map));
     FS.readFile(map.from, {encoding: 'utf8'}, function(err, data) {
       if (err) {
         console.log('error reading file:' + map.from);
         throw err;
       }
-      console.log('rendering:' + data);
       var rendered = "";
       try {
         rendered = EJS.render(data, config);
@@ -67,14 +111,12 @@ var renderFile = function(map, config, onDone) {
       }
       FS.writeFile(map.to, rendered, function(err) {
         if (err) {throw err}
-        console.log('wrote file:' + map.to);
         onDone(map.to);
       });
     });
 }
 
 var copyFile = function(map, onDone) {
-  console.log('copying:' + JSON.stringify(map));
   FS.readFile(map.from, function(err, data) {
     if (err) {throw err}
     FS.writeFile(map.to, data, function(err) {
@@ -85,45 +127,54 @@ var copyFile = function(map, onDone) {
 }
 
 var processFilesInQueue = function(config, onDone) {
+  if (FILES_TO_PROCESS.length == 0) {
+    return onDone();
+  }
   for (var i = 0; i < FILES_TO_PROCESS.length; ++i) {
-    var onDone = function(newFile) {
+    var onDoneWithFile = function(newFile) {
       FILES_PROCESSED.push(newFile);
       if (FILES_PROCESSED.length === FILES_TO_PROCESS.length) {
+        console.log('Created ' + FILES_PROCESSED + ' new files');
         onDone();
       }
     };
     if (FILES_TO_PROCESS[i].method === 'render') {
-      renderFile(FILES_TO_PROCESS[i], config, onDone);
+      renderFile(FILES_TO_PROCESS[i], config, onDoneWithFile);
     } else {
-      copyFile(FILES_TO_PROCESS[i], onDone);
+      copyFile(FILES_TO_PROCESS[i], onDoneWithFile);
     }
   }
 }
 
 var alterSourcePaths = function(maps) {
   for (var i = 0; i < maps.length; ++i) {
-    maps[i].from = DEST_DIR + '/' + maps[i].from;
+    maps[i].from = SRC_DIR + '/' + maps[i].from;
   }
 }
 
-var TAR_FILENAME = DEST_DIR + '/package.tgz';
-var runForPackage = function(packageName, config) {
-  AUTH.login(function(email, password) {
+var TAR_FILENAME = SRC_DIR + '/package.tgz';
+var runForPackage = function(packageName, config, onDone) {
+  console.log('building:' + packageName);
+  maybeLogIn(function(email, password) {
     var maybeHandleErr = function(err) {
       if (err) {
-        recursiveRmdir(DEST_DIR);
+        recursiveRmdir(SRC_DIR);
         throw err;
       }
     }
-    FS.mkdir(DEST_DIR, function (err) {
+    FS.mkdir(SRC_DIR, function (err) {
       maybeHandleErr(err);
       var writeStream = FS.createWriteStream(TAR_FILENAME, {encoding: 'binary'});
       SERVER.getPackage(email, password, packageName, writeStream, function(err, data) {
         maybeHandleErr(err);
-        EXEC('tar xzf ' + TAR_FILENAME + ' -C ' + DEST_DIR + '/', function(err, stdout, stderr) {
+        var tarCmd = 'tar xzf ' + TAR_FILENAME + ' -C ' + SRC_DIR + '/';
+        EXEC(tarCmd, function(err, stdout, stderr) {
           maybeHandleErr(err);
-          renderAndCopyFiles(config, function() {
-            recursiveRmdir(DEST_DIR);
+          getPackageDef(function(packageDef) {
+            buildCode(packageDef, config, function() {
+              recursiveRmdir(SRC_DIR);
+              if (onDone) {onDone();}
+            });
           });
         });
       });
@@ -132,9 +183,11 @@ var runForPackage = function(packageName, config) {
 }
 
 var runForRepo = function(repoLoc, config) {
-  Repository.clone(repoLoc, DEST_DIR, function(err, repo) {
-    renderAndCopyFiles(config, function() {
-      recursiveRmdir(DEST_DIR);
+  Repository.clone(repoLoc, SRC_DIR, function(err, repo) {
+    getPackageDef(function(packageDef) {
+      buildCode(packageDef, config, function() {
+        recursiveRmdir(SRC_DIR);
+      });
     });
   });
 }
@@ -156,6 +209,20 @@ var recursiveRmdir = function(dirName) {
     }
   }
   FS.rmdirSync(dirName);
+}
+
+var EMAIL, PASSWORD;
+
+var maybeLogIn = function(onDone) {
+  if (!EMAIL || !PASSWORD) {
+    AUTH.login(function(email, pass) {
+      EMAIL = email;
+      PASSWORD = pass;
+      onDone(email, pass);
+    });
+  } else {
+    onDone(EMAIL, PASSWORD);
+  }
 }
 
 exports.run = function(args) {
