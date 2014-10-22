@@ -27,9 +27,14 @@ if (!command) {
            command === 'define' ||
            command === 'publish' ||
            command === 'adduser') {
-  if (require('./' + command + '.js').run(cmdArgs)) {
-    console.log("returned error, showing help");
-    showHelp();
+  try {
+    if (require('./' + command + '.js').run(cmdArgs)) {
+      console.log("returned error, showing help");
+      showHelp();
+    }
+  } catch (e) {
+    console.log('Exception while running:' + JSON.stringify(e));
+    process.exit(1);
   }
 } else {
   console.log('unsupported command:' + command);

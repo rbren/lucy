@@ -24,7 +24,7 @@ var getPackageDef = function(onDone) {
       packageDef = JSON.parse(data);
     } catch (e) {
       console.log('Error parsing package.json');
-      throw e;
+      throw e; 
     }
     onDone(packageDef);
   });
@@ -80,7 +80,10 @@ var runJsScripts = function(packageDef, config, onDone) {
   }
   var i = -1;
   var runNextScript = function(err) {
-    if (err) {throw err}
+    if (err) {
+      console.log(JSON.stringify(err));
+      throw err; 
+    }
     if (++i == scripts.length) {
       return onDone();
     }
@@ -91,9 +94,7 @@ var runJsScripts = function(packageDef, config, onDone) {
 }
 
 var renderAndCopyFiles = function(packageDef, config, onDone) {
-  console.log('rendering...');
   alterSourcePaths(packageDef.files);
-  console.log('new filemap:' + JSON.stringify(packageDef.files));
   FILES_TO_PROCESS = packageDef.files;
   FILES_PROCESSED = [];
   processFilesInQueue(config, onDone);
@@ -103,16 +104,20 @@ var renderFile = function(map, config, onDone) {
     FS.readFile(map.from, {encoding: 'utf8'}, function(err, data) {
       if (err) {
         console.log('error reading file:' + map.from);
-        throw err;
+        throw err; 
       }
       var rendered = "";
       try {
         rendered = EJS.render(data, config);
       } catch (e) {
-        throw "Failed to render!" + e;
+        console.log("Failed to render!" + e);
+        throw e; 
       }
       FS.writeFile(map.to, rendered, function(err) {
-        if (err) {throw err}
+        if (err) {
+          console.log(JSON.stringify(err));
+          throw err;
+        }
         onDone(map.to);
       });
     });
@@ -129,9 +134,7 @@ var copyFile = function(map, onDone) {
 }
 
 var processFilesInQueue = function(config, onDone) {
-  console.log('proc files:' + JSON.stringify(FILES_TO_PROCESS));
   if (FILES_TO_PROCESS.length == 0) {
-    console.log('no files!');
     return onDone();
   }
   for (var i = 0; i < FILES_TO_PROCESS.length; ++i) {
@@ -142,7 +145,6 @@ var processFilesInQueue = function(config, onDone) {
         onDone();
       }
     };
-    console.log('file:' + JSON.stringify(FILES_TO_PROCESS[i]));
     if (FILES_TO_PROCESS[i].method === 'render') {
       renderFile(FILES_TO_PROCESS[i], config, onDoneWithFile);
     } else {
@@ -159,7 +161,6 @@ var alterSourcePaths = function(maps) {
 
 var TAR_FILENAME = SRC_DIR + '/package.tgz';
 var runForPackage = function(packageName, config, onDone) {
-  console.log('building:' + packageName);
   maybeLogIn(function(email, password) {
     var maybeHandleErr = function(err) {
       if (err) {
@@ -198,7 +199,6 @@ var runForRepo = function(repoLoc, config) {
 }
 
 var recursiveRmdir = function(dirName) {
-  console.log('rmdir:' + dirName);
   var list = FS.readdirSync(dirName);
   for (var i = 0; i < list.length; i++) {
     var filename = PATH.join(dirName, list[i]);
@@ -239,7 +239,7 @@ exports.run = function(args) {
   FS.readFile(config, function(err, data) {
     if (err) {
       console.log('error reading from config:' + config);
-      throw err;
+      throw err; 
     }
     try {
       data = JSON.parse(data);
@@ -249,6 +249,7 @@ exports.run = function(args) {
     }
     if (runFromSource(source, data)) {
       console.log('Couldn\'t parse source:' + source);
+      throw new Error();
     }
   });
 }
