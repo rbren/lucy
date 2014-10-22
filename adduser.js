@@ -1,5 +1,3 @@
-var REQUEST = require('request');
-var HTTP = require('http');
 var AUTH = require('./auth.js');
 var SERVER = require('./server.js');
 
