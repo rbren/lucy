@@ -1,0 +1,7 @@
+{
+  "name": "test-hello-lucy-adversary",
+  "description": "This is a test",
+  "sample_input": {
+    "name": "foobar"
+  }
+}

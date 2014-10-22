@@ -91,7 +91,9 @@ var runJsScripts = function(packageDef, config, onDone) {
 }
 
 var renderAndCopyFiles = function(packageDef, config, onDone) {
+  console.log('rendering...');
   alterSourcePaths(packageDef.files);
+  console.log('new filemap:' + JSON.stringify(packageDef.files));
   FILES_TO_PROCESS = packageDef.files;
   FILES_PROCESSED = [];
   processFilesInQueue(config, onDone);
@@ -127,7 +129,9 @@ var copyFile = function(map, onDone) {
 }
 
 var processFilesInQueue = function(config, onDone) {
+  console.log('proc files:' + JSON.stringify(FILES_TO_PROCESS));
   if (FILES_TO_PROCESS.length == 0) {
+    console.log('no files!');
     return onDone();
   }
   for (var i = 0; i < FILES_TO_PROCESS.length; ++i) {
@@ -138,6 +142,7 @@ var processFilesInQueue = function(config, onDone) {
         onDone();
       }
     };
+    console.log('file:' + JSON.stringify(FILES_TO_PROCESS[i]));
     if (FILES_TO_PROCESS[i].method === 'render') {
       renderFile(FILES_TO_PROCESS[i], config, onDoneWithFile);
     } else {

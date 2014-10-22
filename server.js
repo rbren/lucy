@@ -1,16 +1,23 @@
 var REQUEST = require('request');
 
-var LUCY_HOST = 'http://54.213.18.26';
+var LUCY_HOST = process.env.LUCY_HOST || 'http://lucyreg.bbrennan.info';
+console.log("Connecting to Lucy at " + LUCY_HOST);
 var LUCY_PORT = 3000;
 var LUCY_URL = LUCY_HOST + ':' + LUCY_PORT;
 var LUCY_VERSION = '0.1.0';
+
+var ERROR_PREFIX = 'Error'
 
 var handleResponse = function(callback, ignoreBody) {
   return function(err, res, body) {
     if (err) { 
       console.log('Error connecting to Lucy\'s servers:' + JSON.stringify(err) + '::' + JSON.stringify(res));
+      process.exit(1);
     } else if (!ignoreBody) {
       console.log(body);
+      if (body.indexOf(ERROR_PREFIX) === 0) {
+        process.exit(1);
+      }
     }
     if (callback) {
       callback(err, body);

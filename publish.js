@@ -6,11 +6,11 @@ var AUTH = require('./auth.js');
 var SERVER = require('./server.js');
 
 exports.run = function(args) {
-  console.log('publishing:' + JSON.stringify(args));
   var dir = args[0];
   if (!dir) {
     dir = '.';
   }
+  console.log('publishing:' + dir);
   AUTH.login(function(email, password) {
     sendPackage(dir, email, password);
   });
@@ -26,7 +26,9 @@ var sendPackage = function(dir, email, password) {
       throw e;
     }
     var tarName = '/tmp/.lucytmp.tgz';
-    EXEC('tar czf ' + tarName + ' ' + dir, function(err, stdout, stderr) {
+    var tarCmd = 'tar czf ' + tarName + ' -C' + dir + '.';
+    console.log('Running tar cmd:' + tarCmd);
+    EXEC('tar czf ' + tarName + ' -C ' + dir + ' .', function(err, stdout, stderr) {
       if (err) {throw err}
       var readStream = FS.createReadStream(tarName);
       readStream.setEncoding('binary');

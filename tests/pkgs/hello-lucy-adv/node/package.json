@@ -1,0 +1,9 @@
+{
+  "lucy_def": "test-hello-lucy-adversary",
+  "package_name": "node",
+  "files": [{
+    "from": "hello.js",
+    "to": "hello.js",
+    "method": "render"
+  }]
+}
