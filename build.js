@@ -161,15 +161,23 @@ var alterSourcePaths = function(maps) {
 
 var TAR_FILENAME = SRC_DIR + '/package.tgz';
 var runForPackage = function(packageName, config, onDone) {
+  console.log('run for packag:' + packageName);
   maybeLogIn(function(email, password) {
     var maybeHandleErr = function(err) {
       if (err) {
         recursiveRmdir(SRC_DIR);
-        throw err;
+        if (err.code === 'EEXIST') {
+          console.log('Removed old ' + SRC_DIR);
+          runForPackage(packageName, config, onDone);
+          return true;
+        } else {
+          console.log(JSON.stringify(err));
+          throw err;
+        }
       }
     }
     FS.mkdir(SRC_DIR, function (err) {
-      maybeHandleErr(err);
+      if (maybeHandleErr(err)) {return}
       var writeStream = FS.createWriteStream(TAR_FILENAME, {encoding: 'binary'});
       SERVER.getPackage(email, password, packageName, writeStream, function(err, data) {
         maybeHandleErr(err);
@@ -183,16 +191,6 @@ var runForPackage = function(packageName, config, onDone) {
             });
           });
         });
-      });
-    });
-  });
-}
-
-var runForRepo = function(repoLoc, config) {
-  Repository.clone(repoLoc, SRC_DIR, function(err, repo) {
-    getPackageDef(function(packageDef) {
-      buildCode(packageDef, config, function() {
-        recursiveRmdir(SRC_DIR);
       });
     });
   });
@@ -255,10 +253,8 @@ exports.run = function(args) {
 }
 
 var runFromSource = function(source, config) {
-  if (source.lastIndexOf('.git') == source.length - 4) {
-    console.log('running from git repo:' + sourceStr);
-    runForRepo(source, data);
-  } else if (true) {
+  // TODO: add switch for different source types
+  if (true) {
     var colon = source.indexOf(':');
     if (colon === -1) {
       source += colon + source;
