@@ -10,7 +10,7 @@ exports.run = function(args) {
   if (!dir) {
     dir = '.';
   }
-  console.log('publishing:' + dir);
+  console.log('Publishing:' + dir);
   AUTH.login(function(email, password) {
     sendPackage(dir, email, password);
   });
@@ -27,7 +27,6 @@ var sendPackage = function(dir, email, password) {
     }
     var tarName = '/tmp/.lucytmp.tgz';
     var tarCmd = 'tar czf ' + tarName + ' -C' + dir + '.';
-    console.log('Running tar cmd:' + tarCmd);
     EXEC('tar czf ' + tarName + ' -C ' + dir + ' .', function(err, stdout, stderr) {
       if (err) {throw err}
       var readStream = FS.createReadStream(tarName);
