@@ -28,7 +28,9 @@ var getPassword = function(isConfirm, onDone, ignoreCache) {
   });
 }
 
-var LOGIN_MSG = 'You\'ll need to log in to do that. If you don\'t already have an account, run:\nlucy adduser';
+var LOGIN_MSG = '\nYou\'ll need to log in to do that. If you don\'t already have an account, run:\n' +
+    '    lucy adduser\n\nTip: cache your credentials in $LUCYUSER and $LUCYPASS environment variables\n';
+
 exports.login = function(onDone) {
   if (!process.env["LUCYUSER"]) {
     console.log(LOGIN_MSG);

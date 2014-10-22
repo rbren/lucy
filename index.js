@@ -33,7 +33,8 @@ if (!command) {
       showHelp();
     }
   } catch (e) {
-    console.log('Exception while running:' + JSON.stringify(e));
+    // Thrower decides how to log the exception
+    console.log('Exception while running.');
     process.exit(1);
   }
 } else {
