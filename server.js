@@ -3,7 +3,7 @@ var REQUEST = require('request');
 var LUCY_HOST = process.env.LUCY_HOST || 'http://lucyreg.bbrennan.info';
 var LUCY_PORT = 3000;
 var LUCY_URL = LUCY_HOST + ':' + LUCY_PORT;
-var LUCY_VERSION = '0.0.1';
+var LUCY_VERSION = '0.0.2';
 
 var ERROR_PREFIX = 'Error'
 
@@ -19,7 +19,7 @@ var handleResponse = function(callback, ignoreBody) {
       console.log(body);
       if (serverErr) {
         if (callback) {callback(body);}
-        throw new Error("Server error:" + body);
+        throw new Error();
       }
     }
     if (callback) {
