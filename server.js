@@ -13,9 +13,11 @@ var handleResponse = function(callback, ignoreBody) {
     if (err) { 
       console.log('Error connecting to Lucy\'s servers:' + JSON.stringify(err) + '::' + JSON.stringify(res));
       process.exit(1);
-    } else if (!ignoreBody) {
+    }
+    var severErr = body.indexOf(ERROR_PREFIX) === 0;
+    if (!ignoreBody || serverErr) {
       console.log(body);
-      if (body.indexOf(ERROR_PREFIX) === 0) {
+      if (serverErr) {
         process.exit(1);
       }
     }
