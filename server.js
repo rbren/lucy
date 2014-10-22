@@ -11,7 +11,8 @@ var handleResponse = function(callback, ignoreBody) {
   return function(err, res, body) {
     if (err) { 
       console.log('Error connecting to Lucy\'s servers:' + JSON.stringify(err) + '::' + JSON.stringify(res));
-      process.exit(1);
+      if (callback){callback(err)}
+      throw err;
     }
     var serverErr = body.indexOf(ERROR_PREFIX) === 0;
     if (!ignoreBody || serverErr) {
