@@ -40,7 +40,7 @@ Most users will simply run lucy build to generate code from an existing lucy pac
 
 ### The Definition
 We start with a definition:
-<i>def.json</i>
+<br><br><i>def.json</i>
 ```js
 {
   "name": "hello-world",
@@ -60,12 +60,12 @@ which pushes the definition to lucy's servers.
 
 ### The Package
 Now we create a package by starting a new directory with two files:
-<i>hello.ejs</i>
+<br><br><i>hello.ejs</i>
 ```js
 console.log("<%- greeting %> <%- person %>");
 ```
 
-<i>package.json</i>
+<br><br><i>package.json</i>
 ```js
 {
   "lucy_def": "hello-world",
@@ -86,7 +86,7 @@ which will zip up the directory and upload the resulting tarball.
 
 ### Build!
 Now anyone can create a config.json like
-<i>config.json</i>
+<br><br><i>config.json</i>
 ```js
 {
   "greeting": "Yo",
@@ -100,14 +100,14 @@ lucy build hello-world:js config.json
 ```
 
 which will generate this file in the working directory:
-<i>hello.js</i>
+<br><br><i>hello.js</i>
 ```js
 console.log("Yo lucy");
 ```
 
 ### Extend!
 What's more, you (or anyone else) can add other packages to the hello-world definition, for example:
-<i>hello.ejs</i>
+<br><br><i>hello.ejs</i>
 ```java
 public class HelloWorld {
   public static void main(String[] args) {
@@ -116,7 +116,7 @@ public class HelloWorld {
 }
 ```
 
-<i>package.json</i>
+<br><br><i>package.json</i>
 ```js
 {
   "lucy_def": "hello-world",
@@ -127,6 +127,6 @@ public class HelloWorld {
     "method": "render"
   }]
 }
-
-E-mail bobby@bbrennan.info if you're intersted in giving it a shot!
 ```
+<br><br>
+E-mail bobby@bbrennan.info if you're intersted in giving it a shot!
