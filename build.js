@@ -7,10 +7,6 @@ var EXEC = require('child_process').exec;
 var AUTH = require('./auth.js');
 var SERVER = require('./server.js');
 
-var ignoreFile = function(file) {
-  return file.match(/\.tgz$/) || file.match('/$') || file.match('.*README.md');
-}
-
 var NO_VALIDATE = false;
 
 var FILES_TO_PROCESS = [];
