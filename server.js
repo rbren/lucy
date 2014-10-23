@@ -14,7 +14,7 @@ var handleResponse = function(callback, ignoreBody) {
       if (callback){callback(err)}
       throw err;
     }
-    var serverErr = body.indexOf(ERROR_PREFIX) === 0;
+    var serverErr = !(body instanceof Object) && body.indexOf(ERROR_PREFIX) === 0;
     if (!ignoreBody || serverErr) {
       console.log(body);
       if (serverErr) {
@@ -78,4 +78,28 @@ exports.getPackage = function(email, password, packageName, writeStream, onDone)
     body: buildBody(email, password, packageName), 
     method: 'POST',
   }, handleResponse(onDone, true)).pipe(writeStream);
+}
+
+exports.getDefinition = function(email, password, defName, onDone) {
+  REQUEST({
+    url: LUCY_URL + '/getDefinition',
+    json: true,
+    body: buildBody(email, password, defName),
+    method: 'POST',
+  }, handleResponse(function(err, result) {
+    if (err) {return onDone(err)}
+    console.log('GOT DEF:' + JSON.stringify(result));
+    onDone(null, result);
+  }, true));
+}
+
+exports.getPackageAndDefinition = function(email, password, packageName, writeStream, onDone) {
+  var colon = packageName.indexOf(':');
+  var defn = packageName.substring(0, colon);
+  exports.getDefinition(email, password, defn, function(err, dRes) {
+    if (err) {return onDone(err)}
+    exports.getPackage(email, password, packageName, writeStream, function(err, pRes) {
+      return onDone(err, dRes);
+    });
+  });
 }
