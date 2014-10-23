@@ -23,13 +23,13 @@ lucy build definition:package config.json
 ```
 
 ### Push a new definition
-<i>Note: define is currently only open to beta testers. E-mail bobby@bbrennan.info for access</i>
+<i>Note: define is currently only open to beta testers.  <a href="http://lucybot.github.io/blog/">Join the beta</a> for access</i>
 ```bash
 lucy define definition.json
 ```
 
 ### Add a package to an existing definition
-<i>Note: publish is currently only open to beta testers. E-mail bobby@bbrennan.info for access</i>
+<i>Note: publish is currently only open to beta testers. <a href="http://lucybot.github.io/blog/">Join the beta</a> for access</i>
 ```bash
 lucy publish /path/to/directory/containing/package.json
 ```
@@ -134,4 +134,4 @@ public class HelloWorld {
 }
 ```
 <br><br>
-E-mail bobby@bbrennan.info if you're intersted in giving it a shot!
+<a href="http://lucybot.github.io/blog/">Join the beta</a> if you're intersted in giving it a shot!
