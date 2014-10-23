@@ -1,4 +1,4 @@
-LUCY
+Lucy
 ====
 lucy is a tool for sharing, coordinating, and automating code in any language. lucy works by feeding JSON into code templates, producing customized code that compiles and runs.
 
