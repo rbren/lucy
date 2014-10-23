@@ -36,7 +36,7 @@ There are two main components to a lucy module:<br>
 * DEFINITION - this is JSON that describes what kind of code is being generated, and provides a sample configuration.<br>
 * PACKAGE - this is a set of code templates, scripts, and files that will be used to generate code. There can be multiple packages per definition.<br>
 
-Most users will simply run lucy build to generate code from an existing lucy package. However, you can also create your own definitions and packages to share with others. Let's walk through a "hello world" example.
+Most users will simply run ```bashlucy build``` to generate code from an existing lucy package. However, you can also create your own definitions and packages to share with others. Let's walk through a "hello world" example.
 
 ### The Definition
 We start with a definition:
