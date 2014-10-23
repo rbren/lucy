@@ -1,8 +1,8 @@
 Lucy
 ====
-lucy is a tool for sharing, coordinating, and automating code in any language. lucy works by feeding JSON into code templates, producing customized code that compiles and runs.
+Lucy is a tool for sharing, coordinating, and automating code in any language. Lucy works by feeding JSON into code templates, producing customized code that compiles and runs.
 
-lucy is currently in beta - if you'd like to try it out, please e-mail bobby@bbrennan.info.
+Lucy is currently in beta - if you'd like to try it out, please e-mail bobby@bbrennan.info.
 
 <br><br>
 ## Installation
