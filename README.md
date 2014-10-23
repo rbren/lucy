@@ -5,6 +5,12 @@ Lucy is a tool for sharing, coordinating, and automating code in any language. L
 Lucy is just getting started, but you can keep up with the latest news and learn about what lucy can do here:<br>
 http://lucybot.github.io/blog/
 <br><br>
+Want to get an early peek at everything lucy can do? Join the beta!
+<form action="http://lucyreg.bbrennan.info:3000/beta-signup" method="GET">
+  <input name="email" placeholder="e-mail address"></input>
+</form>
+
+<br><br>
 ## Installation
 You'll need nodejs to run lucy:<br>
 https://github.com/joyent/node/wiki/installing-node.js-via-package-manager
