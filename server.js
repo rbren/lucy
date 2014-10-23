@@ -1,7 +1,7 @@
 var REQUEST = require('request');
 
 var LUCY_HOST = process.env.LUCY_HOST || 'http://lucyreg.bbrennan.info';
-var LUCY_PORT = 3000;
+var LUCY_PORT = process.env.LUCY_PORT || 3000;
 var LUCY_URL = LUCY_HOST + ':' + LUCY_PORT;
 var LUCY_VERSION = '0.0.2';
 
