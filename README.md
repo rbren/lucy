@@ -65,7 +65,7 @@ Now we create a package by starting a new directory with two files:
 console.log('<%- greeting %> <%- person %>');
 ```
 
-<br><br><i>package.json</i>
+<br><i>package.json</i>
 ```js
 {
   "lucy_def": "hello-world",
@@ -116,7 +116,7 @@ public class HelloWorld {
 }
 ```
 
-<br><br><i>package.json</i>
+<br><i>package.json</i>
 ```js
 {
   "lucy_def": "hello-world",
