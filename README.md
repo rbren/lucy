@@ -4,6 +4,7 @@ lucy is a tool for sharing, coordinating, and automating code in any language. l
 
 lucy is currently in beta - if you'd like to try it out, please e-mail bobby@bbrennan.info.
 
+<br><br>
 ## Installation
 You'll need nodejs to run lucy:<br>
 https://github.com/joyent/node/wiki/installing-node.js-via-package-manager
@@ -11,7 +12,7 @@ https://github.com/joyent/node/wiki/installing-node.js-via-package-manager
 ```bash
 sudo npm install -g lucy
 ```
-
+<br><br>
 ## Usage
 ### Build an existing package
 ```bash
@@ -29,7 +30,7 @@ lucy define definition.json
 ```bash
 lucy publish /path/to/directory/containing/package.json
 ```
-
+<br><br>
 ## About
 There are two main components to a lucy module:<br>
 * DEFINITION - this is JSON that describes what kind of code is being generated, and provides a sample configuration.<br>
