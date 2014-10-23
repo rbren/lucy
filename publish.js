@@ -26,8 +26,8 @@ var sendPackage = function(dir, email, password) {
       throw e;
     }
     SERVER.getDefinition(email, password, pkgDef.lucy_def, function(err, defn) {
-      //TODO: actually build sample_input against definition
-      var tarName = '/tmp/.lucytmp.tgz';
+      //TODO: Validate by building with sample_input
+      var tarName = '/tmp/lucytmp.tgz';
       var tarCmd = 'tar czf ' + tarName + ' -C' + dir + '.';
       EXEC('tar czf ' + tarName + ' -C ' + dir + ' .', function(err, stdout, stderr) {
         if (err) {throw err}
