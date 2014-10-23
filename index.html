@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <title>Lucy Blog by bobby-brennan</title>
+  </head>
+
+  <body>
+    <div id="container">
+      <div class="inner">
+
+        <header>
+          <h1>Lucy Blog</h1>
+          <h2>See what lucy can do!</h2>
+        </header>
+
+        <section id="downloads" class="clearfix">
+          <a href="https://github.com/bobby-brennan/lucy/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
+          <a href="https://github.com/bobby-brennan/lucy/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
+          <a href="https://github.com/bobby-brennan/lucy" id="view-on-github" class="button"><span>View on GitHub</span></a>
+        </section>
+
+        <hr>
+
+        <section id="main_content">
+          <h3>
+<a name="first-post-hello-world" class="anchor" href="#first-post-hello-world"><span class="octicon octicon-link"></span></a>First post: Hello World</h3>
+
+<p>10/23/2014<br><br>
+The first official lucy release was pushed today! You can see the project here:
+<br>
+<a href="https://github.com/bobby-brennan/lucy">https://github.com/bobby-brennan/lucy</a>
+<br>
+<code>define</code> and <code>publish</code> are still in beta, but you can <code>build</code> all you want! E-mail me (<a href="mailto:bobby@bbrennan.info">bobby@bbrennan.info</a>) if you'd like an early peek at the full version.
+<br>
+<br>
+So what can lucy do? To start, there are two main components to a lucy module:<br></p>
+
+<ul>
+<li>DEFINITION - this is JSON that describes what kind of code is being generated, and provides a sample configuration.<br>
+</li>
+<li>PACKAGE - this is a set of code templates, scripts, and files that will be used to generate code. There can be multiple packages per definition.<br>
+</li>
+</ul>
+
+<p>Most users will simply run <code>lucy build</code> to generate code from an existing lucy package. However, you can also create your own definitions and packages to share with others. Let's walk through a "hello world" example.</p>
+
+<p><i>Note that while we're in beta, the <code>define</code> and <code>publish</code> commands won't work unless you're signed up. Feel free to jump ahead to <code>build</code> though!</i></p>
+
+<h3>
+<a name="the-definition" class="anchor" href="#the-definition"><span class="octicon octicon-link"></span></a>The Definition</h3>
+
+<p>We start with a definition:
+<br><br><i>def.json</i></p>
+
+<div class="highlight highlight-js"><pre><span class="p">{</span>
+  <span class="s2">"name"</span><span class="o">:</span> <span class="s2">"hello-world"</span><span class="p">,</span>
+  <span class="s2">"description"</span><span class="o">:</span> <span class="s2">"A hello world example for lucy"</span><span class="p">,</span>
+  <span class="s2">"sample_input"</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s2">"greeting"</span><span class="o">:</span> <span class="s2">"Hello"</span><span class="p">,</span>
+    <span class="s2">"person"</span><span class="o">:</span> <span class="s2">"world"</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>and run:</p>
+
+<div class="highlight highlight-bash"><pre>lucy define def.json
+</pre></div>
+
+<p>which pushes the definition to lucy's servers.
+<br></p>
+
+<h3>
+<a name="the-package" class="anchor" href="#the-package"><span class="octicon octicon-link"></span></a>The Package</h3>
+
+<p>Now we create a package by starting a new directory 'pkg'
+<br><br><i>pkg/hello.ejs</i></p>
+
+<div class="highlight highlight-js"><pre><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'&lt;%- greeting %&gt; &lt;%- person %&gt;'</span><span class="p">);</span>
+</pre></div>
+
+<p><br><i>pkg/package.json</i></p>
+
+<div class="highlight highlight-js"><pre><span class="p">{</span>
+  <span class="s2">"lucy_def"</span><span class="o">:</span> <span class="s2">"hello-world"</span><span class="p">,</span>
+  <span class="s2">"package_name"</span><span class="o">:</span> <span class="s2">"js"</span><span class="p">,</span>
+  <span class="s2">"files"</span><span class="o">:</span> <span class="p">[{</span>
+    <span class="s2">"from"</span><span class="o">:</span> <span class="s2">"hello.ejs"</span><span class="p">,</span>
+    <span class="s2">"to"</span><span class="o">:</span> <span class="s2">"hello.js"</span><span class="p">,</span>
+    <span class="s2">"method"</span><span class="o">:</span> <span class="s2">"render"</span>
+  <span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>and run</p>
+
+<div class="highlight highlight-bash"><pre>lucy publish pkg
+</pre></div>
+
+<p>which will zip up the directory and upload the resulting tarball.
+<br></p>
+
+<h3>
+<a name="build" class="anchor" href="#build"><span class="octicon octicon-link"></span></a>Build!</h3>
+
+<p>Now anyone can create a config.json like
+<br><br><i>config.json</i></p>
+
+<div class="highlight highlight-js"><pre><span class="p">{</span>
+  <span class="s2">"greeting"</span><span class="o">:</span> <span class="s2">"Yo"</span><span class="p">,</span>
+  <span class="s2">"person"</span><span class="o">:</span> <span class="s2">"lucy"</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>and run</p>
+
+<div class="highlight highlight-bash"><pre>lucy build hello-world:js config.json
+</pre></div>
+
+<p>which will generate this file in the working directory:
+<br><br><i>hello.js</i></p>
+
+<div class="highlight highlight-js"><pre><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"Yo lucy"</span><span class="p">);</span>
+</pre></div>
+
+<p><br></p>
+
+<h3>
+<a name="extend" class="anchor" href="#extend"><span class="octicon octicon-link"></span></a>Extend!</h3>
+
+<p>What's more, you (or anyone else) can add other packages to the hello-world definition, for example:
+<br><br><i>hello.ejs</i></p>
+
+<div class="highlight highlight-java"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">HelloWorld</span> <span class="o">{</span>
+  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"&lt;%- greeting %&gt; &lt;%- person %&gt;"</span><span class="o">);</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
+<p><br><i>package.json</i></p>
+
+<div class="highlight highlight-js"><pre><span class="p">{</span>
+  <span class="s2">"lucy_def"</span><span class="o">:</span> <span class="s2">"hello-world"</span><span class="p">,</span>
+  <span class="s2">"package_name"</span><span class="o">:</span> <span class="s2">"java"</span><span class="p">,</span>
+  <span class="s2">"files"</span><span class="o">:</span> <span class="p">[{</span>
+    <span class="s2">"from"</span><span class="o">:</span> <span class="s2">"hello.ejs"</span><span class="p">,</span>
+    <span class="s2">"to"</span><span class="o">:</span> <span class="s2">"HelloWorld.java"</span><span class="p">,</span>
+    <span class="s2">"method"</span><span class="o">:</span> <span class="s2">"render"</span>
+  <span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+
+<p><br><br>
+E-mail <a href="mailto:bobby@bbrennan.info">bobby@bbrennan.info</a> if you're intersted in giving it a shot!</p>
+        </section>
+
+        <footer>
+          Lucy Blog is maintained by <a href="https://github.com/bobby-brennan">bobby-brennan</a><br>
+          This page was generated by <a href="http://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.
+        </footer>
+
+        
+      </div>
+    </div>
+  </body>
+</html>
