@@ -20,27 +20,27 @@ lucy build definition:package config.json
 ```
 
 ### Push a new definition
-* Note: define is currently only open to beta testers. E-mail bobby@bbrennan.info for access
+<i>Note: define is currently only open to beta testers. E-mail bobby@bbrennan.info for access</i>
 ```bash
 lucy define definition.json
 ```
 
 ### Add a package to an existing definition
-* Note: publish is currently only open to beta testers. E-mail bobby@bbrennan.info for access
+<i>Note: publish is currently only open to beta testers. E-mail bobby@bbrennan.info for access</i>
 ```bash
 lucy publish /path/to/directory/containing/package.json
 ```
 
 ## About
 There are two main components to a lucy module:<br>
-DEFINITION - this is JSON that describes what kind of code is being generated, and provides a sample configuration.<br>
-PACKAGE - this is a set of code templates, scripts, and files that will be used to generate code. There can be multiple packages per definition.<br>
+* DEFINITION - this is JSON that describes what kind of code is being generated, and provides a sample configuration.<br>
+* PACKAGE - this is a set of code templates, scripts, and files that will be used to generate code. There can be multiple packages per definition.<br>
 
 Most users will simply run lucy build to generate code from an existing lucy package. However, you can also create your own definitions and packages to share with others. Let's walk through a "hello world" example.
 
 ### The Definition
 We start with a definition:
-* def.json
+<i>def.json</i>
 ```js
 {
   "name": "hello-world",
@@ -60,12 +60,12 @@ which pushes the definition to lucy's servers.
 
 ### The Package
 Now we create a package by starting a new directory with two files:
-* hello.ejs
+<i>hello.ejs</i>
 ```js
 console.log("<%- greeting %> <%- person %>");
 ```
 
-* package.json
+<i>package.json</i>
 ```js
 {
   "lucy_def": "hello-world",
@@ -86,7 +86,7 @@ which will zip up the directory and upload the resulting tarball.
 
 ### Build!
 Now anyone can create a config.json like
-* config.json
+<i>config.json</i>
 ```js
 {
   "greeting": "Yo",
@@ -100,14 +100,14 @@ lucy build hello-world:js config.json
 ```
 
 which will generate this file in the working directory:
-* hello.js
+<i>hello.js</i>
 ```js
 console.log("Yo lucy");
 ```
 
 ### Extend!
 What's more, you (or anyone else) can add other packages to the hello-world definition, for example:
-* hello.ejs
+<i>hello.ejs</i>
 ```java
 public class HelloWorld {
   public static void main(String[] args) {
@@ -116,7 +116,7 @@ public class HelloWorld {
 }
 ```
 
-* package.json
+<i>package.json</i>
 ```js
 {
   "lucy_def": "hello-world",
