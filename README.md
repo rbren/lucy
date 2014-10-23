@@ -123,7 +123,7 @@ public class HelloWorld {
   "package_name": "java",
   "files": [{
     "from": "hello.ejs",
-    "to": "hello.js",
+    "to": "HelloWorld.java",
     "method": "render"
   }]
 }
