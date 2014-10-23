@@ -66,7 +66,6 @@ var validateConfig = function(sample, config, key) {
 }
 
 var buildCode = function(packageDef, definition, config, onDone) {
-  console.log('bc:' + JSON.stringify(definition));
   var validateError = validateConfig(definition.sample_input, config);
   if (validateError) {
     return onDone("Config error for key:\n" + validateError.key + "\n" + validateError.err);
