@@ -4,8 +4,8 @@ Lucy is a tool for sharing, coordinating, and automating code. Lucy works by fee
 
 Lucy is currently in beta - if you'd like to try it out, please e-mail bobby@bbrennan.info for access.
 
-### Installation
-You'll need nodejs to run lucy:
+## Installation
+You'll need nodejs to run lucy:<br>
 https://github.com/joyent/node/wiki/installing-node.js-via-package-manager
 
 Then you can run
@@ -13,19 +13,19 @@ Then you can run
 sudo npm install -g lucy
 ```
 
-### Usage
-## Build an existing package
+## Usage
+### Build an existing package
 ```bash
 lucy build definition:package config.json
 ```
 
-## Push a new definition
+### Push a new definition
 * Note: define is currently only open to beta testers. E-mail bobby@bbrennan.info for access
 ```bash
 lucy define definition.json
 ```
 
-## Add a package to an existing definition
+### Add a package to an existing definition
 * Note: publish is currently only open to beta testers. E-mail bobby@bbrennan.info for access
 ```bash
 lucy publish /path/to/directory/containing/package.json
