@@ -38,6 +38,8 @@ There are two main components to a lucy module:<br>
 
 Most users will simply run ```lucy build``` to generate code from an existing lucy package. However, you can also create your own definitions and packages to share with others. Let's walk through a "hello world" example.
 
+<i>Note that while we're in beta, the ```define``` and ```publish``` commands won't work unless you're signed up. Feel free to jump ahead to ```build``` though!</i>
+
 ### The Definition
 We start with a definition:
 <br><br><i>def.json</i>
