@@ -11,6 +11,8 @@ var ignoreFile = function(file) {
   return file.match(/\.tgz$/) || file.match('/$') || file.match('.*README.md');
 }
 
+var NO_VALIDATE = false;
+
 var FILES_TO_PROCESS = [];
 var FILES_PROCESSED = [];
 var SRC_DIR = '/tmp/lucytmp';
@@ -30,8 +32,49 @@ var getPackageDef = function(onDone) {
   });
 }
 
-var buildCode = function(packageDef, config, onDone) {
-  console.log('building code:' + packageDef.lucy_def);
+var getType = function(thing) {
+  if (Array.isArray(thing)) {
+    return 'array';
+  } else {
+    return typeof thing;
+  }
+}
+
+var validateConfig = function(sample, config, key) {
+  if (NO_VALIDATE) {return}
+  var sType = getType(sample);
+  var cType = getType(config);
+  if (sample && !config) {
+    return {err: "Missing from config JSON", key:key};
+  } else if (cType !== sType) {
+    return {err: "Expected type " + sType + " but found " + cType, key:key};
+  } else if (cType === 'array') {
+    for (var i = 0; i < config.length; ++i) {
+      var innerErr = validateConfig(sample[0], config[i], key);
+      if (innerErr) {
+        innerErr.key += '[' + i + ']';
+        return innerErr;
+      }
+    }
+  } else if (sType === 'object') {
+    for (var pKey in sample) {
+      var innerErr = validateConfig(sample[pKey], config[pKey], pKey);
+      if (innerErr) {
+        if (key) {
+          innerErr.key = key + '.' + innerErr.key;
+        }
+        return innerErr;
+      }
+    }
+  }
+}
+
+var buildCode = function(packageDef, definition, config, onDone) {
+  console.log('bc:' + JSON.stringify(definition));
+  var validateError = validateConfig(definition.sample_input, config);
+  if (validateError) {
+    return onDone("Config error for key:\n" + validateError.key + "\n" + validateError.err);
+  }
   buildDependencies(packageDef, config, function() {
     console.log('++built deps')
     renderAndCopyFiles(packageDef, config, function() {
@@ -93,6 +136,9 @@ var runJsScripts = function(packageDef, config, onDone) {
 }
 
 var renderAndCopyFiles = function(packageDef, config, onDone) {
+  if (!packageDef.files) {
+    return;
+  }
   alterSourcePaths(packageDef.files);
   FILES_TO_PROCESS = packageDef.files;
   FILES_PROCESSED = [];
@@ -181,13 +227,14 @@ var runForPackage = function(packageName, config, onDone) {
     FS.mkdir(SRC_DIR, function (err) {
       if (maybeHandleErr(err)) {return}
       var writeStream = FS.createWriteStream(TAR_FILENAME, {encoding: 'binary'});
-      SERVER.getPackage(email, password, packageName, writeStream, function(err, data) {
+      SERVER.getPackageAndDefinition(email, password, packageName, writeStream, function(err, definition) {
         maybeHandleErr(err, true);
         var tarCmd = 'tar xzf ' + TAR_FILENAME + ' -C ' + SRC_DIR + '/';
         EXEC(tarCmd, function(err, stdout, stderr) {
           maybeHandleErr(err);
           getPackageDef(function(packageDef) {
-            buildCode(packageDef, config, function() {
+            buildCode(packageDef, definition, config, function(err) {
+              maybeHandleErr(err);
               recursiveRmdir(SRC_DIR);
               if (onDone) {onDone();}
             });
@@ -233,6 +280,7 @@ var maybeLogIn = function(onDone) {
 exports.run = function(args) {
   var source = args[0];
   var config = args[1];
+  NO_VALIDATE = args[2] && args[2].toLowerCase() === '--force';
   if (!source || !config) {
     return true;
   }

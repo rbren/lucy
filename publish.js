@@ -25,15 +25,18 @@ var sendPackage = function(dir, email, password) {
       console.log('error parsing package.json');
       throw e;
     }
-    var tarName = '/tmp/.lucytmp.tgz';
-    var tarCmd = 'tar czf ' + tarName + ' -C' + dir + '.';
-    EXEC('tar czf ' + tarName + ' -C ' + dir + ' .', function(err, stdout, stderr) {
-      if (err) {throw err}
-      var readStream = FS.createReadStream(tarName);
-      readStream.setEncoding('binary');
-      FS.readFile(tarName, {encoding: 'binary'}, function(err, data) {
+    SERVER.getDefinition(email, password, pkgDef.lucy_def, function(err, defn) {
+      //TODO: actually build sample_input against definition
+      var tarName = '/tmp/.lucytmp.tgz';
+      var tarCmd = 'tar czf ' + tarName + ' -C' + dir + '.';
+      EXEC('tar czf ' + tarName + ' -C ' + dir + ' .', function(err, stdout, stderr) {
         if (err) {throw err}
-        SERVER.publish(email, password, pkgDef, data);
+        var readStream = FS.createReadStream(tarName);
+        readStream.setEncoding('binary');
+        FS.readFile(tarName, {encoding: 'binary'}, function(err, data) {
+          if (err) {throw err}
+          SERVER.publish(email, password, pkgDef, data);
+        });
       });
     });
   });
