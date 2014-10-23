@@ -91,7 +91,6 @@ exports.getDefinition = function(email, password, defName, onDone) {
     method: 'POST',
   }, handleResponse(function(err, result) {
     if (err) {return onDone(err)}
-    console.log('GOT DEF:' + JSON.stringify(result));
     onDone(null, result);
   }, true));
 }
