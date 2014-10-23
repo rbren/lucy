@@ -1,10 +1,9 @@
 Lucy
 ====
 Lucy is a tool for sharing, coordinating, and automating code in any language. Lucy works by feeding JSON into code templates, producing customized code that compiles and runs.
-<br>
+<br><br>
 Lucy is just getting started, but you can keep up with the latest news and learn about what lucy can do here:<br>
 http://lucybot.github.io/blog/
-
 <br><br>
 ## Installation
 You'll need nodejs to run lucy:<br>
