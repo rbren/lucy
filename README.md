@@ -38,6 +38,8 @@ There are two main components to a lucy module:<br>
 
 Most users will simply run ```lucy build``` to generate code from an existing lucy package. However, you can also create your own definitions and packages to share with others. Let's walk through a "hello world" example.
 
+<i>Note that while we're in beta, the ```define``` and ```publish``` commands won't work unless you're signed up. Feel free to jump ahead to ```build``` though!</i>
+
 ### The Definition
 We start with a definition:
 <br><br><i>def.json</i>
@@ -59,13 +61,13 @@ lucy define def.json
 which pushes the definition to lucy's servers.
 <br>
 ### The Package
-Now we create a package by starting a new directory with two files:
-<br><br><i>hello.ejs</i>
+Now we create a package by starting a new directory 'pkg'
+<br><br><i>pkg/hello.ejs</i>
 ```js
 console.log('<%- greeting %> <%- person %>');
 ```
 
-<br><i>package.json</i>
+<br><i>pkg/package.json</i>
 ```js
 {
   "lucy_def": "hello-world",
@@ -80,7 +82,7 @@ console.log('<%- greeting %> <%- person %>');
 
 and run
 ```bash
-lucy publish /path/to/dir
+lucy publish pkg
 ```
 which will zip up the directory and upload the resulting tarball.
 <br>
