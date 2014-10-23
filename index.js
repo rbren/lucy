@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+Error.stackTraceLimit = 0;
+
 var showHelp = function() {
   console.log('LUCY\n\n');
   console.log('Usage: lucy <command> <args>\n\n');

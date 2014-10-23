@@ -81,7 +81,6 @@ var runJsScripts = function(packageDef, config, onDone) {
   var i = -1;
   var runNextScript = function(err) {
     if (err) {
-      console.log(JSON.stringify(err));
       throw err; 
     }
     if (++i == scripts.length) {
@@ -161,9 +160,8 @@ var alterSourcePaths = function(maps) {
 
 var TAR_FILENAME = SRC_DIR + '/package.tgz';
 var runForPackage = function(packageName, config, onDone) {
-  console.log('run for packag:' + packageName);
   maybeLogIn(function(email, password) {
-    var maybeHandleErr = function(err) {
+    var maybeHandleErr = function(err, dontLog) {
       if (err) {
         recursiveRmdir(SRC_DIR);
         if (err.code === 'EEXIST') {
@@ -171,8 +169,12 @@ var runForPackage = function(packageName, config, onDone) {
           runForPackage(packageName, config, onDone);
           return true;
         } else {
-          console.log(JSON.stringify(err));
-          throw err;
+          if (dontLog) {
+            throw new Error();
+          } else {
+            console.log('Error while building:' + JSON.stringify(err));
+            throw err;
+          }
         }
       }
     }
@@ -180,7 +182,7 @@ var runForPackage = function(packageName, config, onDone) {
       if (maybeHandleErr(err)) {return}
       var writeStream = FS.createWriteStream(TAR_FILENAME, {encoding: 'binary'});
       SERVER.getPackage(email, password, packageName, writeStream, function(err, data) {
-        maybeHandleErr(err);
+        maybeHandleErr(err, true);
         var tarCmd = 'tar xzf ' + TAR_FILENAME + ' -C ' + SRC_DIR + '/';
         EXEC(tarCmd, function(err, stdout, stderr) {
           maybeHandleErr(err);
