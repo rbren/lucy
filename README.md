@@ -62,7 +62,7 @@ which pushes the definition to lucy's servers.
 Now we create a package by starting a new directory with two files:
 <br><br><i>hello.ejs</i>
 ```js
-console.log("<%- greeting %> <%- person %>");
+console.log('<%- greeting %> <%- person %>');
 ```
 
 <br><br><i>package.json</i>
