@@ -302,7 +302,7 @@ var runFromSource = function(source, config) {
   if (true) {
     var colon = source.indexOf(':');
     if (colon === -1) {
-      source += colon + source;
+      source += ':' + source;
     }
     runForPackage(source, config);
   } else {
