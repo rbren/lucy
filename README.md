@@ -57,7 +57,7 @@ and run:
 lucy define def.json
 ```
 which pushes the definition to lucy's servers.
-
+<br>
 ### The Package
 Now we create a package by starting a new directory with two files:
 <br><br><i>hello.ejs</i>
@@ -83,7 +83,7 @@ and run
 lucy publish /path/to/dir
 ```
 which will zip up the directory and upload the resulting tarball.
-
+<br>
 ### Build!
 Now anyone can create a config.json like
 <br><br><i>config.json</i>
@@ -104,7 +104,7 @@ which will generate this file in the working directory:
 ```js
 console.log("Yo lucy");
 ```
-
+<br>
 ### Extend!
 What's more, you (or anyone else) can add other packages to the hello-world definition, for example:
 <br><br><i>hello.ejs</i>
