@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-Error.stackTraceLimit = 0;
+Error.stackTraceLimit = 1;
 
 var showHelp = function() {
   console.log('LUCY\n\n');
