@@ -31,19 +31,20 @@ lucy define definition.json
 lucy publish /path/to/directory/containing/package.json
 ```
 
-### About
+## About
 There are two main components to a lucy module:
 DEFINITION - this is JSON that describes what kind of code is being generated, and provides a sample configuration.
 PACKAGE - this is a set of code templates, scripts, and files that will be used to generate code. There can be multiple packages per definition.
 
-Most users will simply run lucy build to generate code from an existing Lucy package. However, you can also create your own definitions and packages to share with others. As an example, let's walk through a "hello world" example.
+Most users will simply run lucy build to generate code from an existing Lucy package. However, you can also create your own definitions and packages to share with others. Let's walk through a "hello world" example.
 
+### The Definition
 We start with a definition:
 * def.json
 ```js
 {
-  "name": "hello-world"
-  "description": "A hello world example for Lucy"
+  "name": "hello-world",
+  "description": "A hello world example for Lucy",
   "sample_input": {
     "greeting": "Hello",
     "person": "world"
@@ -55,7 +56,9 @@ and run:
 ```bash
 lucy define def.json
 ```
+which pushes the definition to Lucy's servers.
 
+### The Package
 Now we create a package by starting a new directory with two files:
 * hello.ejs
 ```js
@@ -79,8 +82,10 @@ and run
 ```bash
 lucy publish /path/to/dir
 ```
+which will zip up the directory and upload the resulting tarball.
 
-Then anyone can create a config.json like
+### Build!
+Now anyone can create a config.json like
 * config.json
 ```js
 {
@@ -121,4 +126,6 @@ public class HelloWorld {
     "method": "render"
   }]
 }
+
+E-mail bobby@bbrennan.info if you're intersted in giving it a shot!
 ```
