@@ -84,7 +84,7 @@ which pushes the definition to lucy's servers.
 <br>
 ### The Package
 Now we create a package by starting a new directory 'pkg'
-<br><br><i>pkg/hello.ejs</i>
+<br><br><i>pkg/hello.js</i>
 ```js
 console.log('<%- greeting %> <%- person %>');
 ```
