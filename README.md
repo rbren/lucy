@@ -75,6 +75,7 @@ We start with a definition:
   }
 }
 ```
+(you'll need to replace "hello-world" with something unique)
 
 and run:
 ```bash
