@@ -14,6 +14,7 @@ https://github.com/joyent/node/wiki/installing-node.js-via-package-manager
 
 ```bash
 sudo npm install -g lucy
+lucy adduser
 ```
 <br><br>
 ## Usage
