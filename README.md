@@ -44,7 +44,7 @@ Most users will simply run ```lucy build``` to generate code from an existing lu
 <i>Note that while we're in beta, the ```define``` and ```publish``` commands won't work unless you're signed up. Feel free to jump ahead to ```build``` though!</i>
 
 ### Quickstart
-To download all the files described in this tutorial, run
+To download all the files described in this tutorial, enter a new directory and run
 ```bash
 lucy build hello-world-starter '{"username": "SOME_UNIQUE_ID"}'
 ```
