@@ -95,9 +95,7 @@ console.log('<%- greeting %> <%- person %>');
   "lucy_def": "hello-world",
   "package_name": "js",
   "files": [{
-    "from": "hello.ejs",
-    "to": "hello.js",
-    "method": "render"
+    "from": "hello.js"
   }]
 }
 ```
@@ -131,9 +129,9 @@ console.log("Yo lucy");
 <br>
 ### Extend!
 What's more, you (or anyone else) can add other packages to the hello-world definition, for example:
-<br><br><i>hello.ejs</i>
+<br><br><i>Hello.java</i>
 ```java
-public class HelloWorld {
+public class Hello {
   public static void main(String[] args) {
     System.out.println("<%- greeting %> <%- person %>");
   }
@@ -146,9 +144,7 @@ public class HelloWorld {
   "lucy_def": "hello-world",
   "package_name": "java",
   "files": [{
-    "from": "hello.ejs",
-    "to": "HelloWorld.java",
-    "method": "render"
+    "from": "Hello.java"
   }]
 }
 ```
