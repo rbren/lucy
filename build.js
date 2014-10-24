@@ -4,6 +4,8 @@ var EJS = require('ejs');
 var GLOB = require('glob');
 var PATH = require('path');
 var EXEC = require('child_process').exec;
+var MKPATH = require('mkpath');
+
 var AUTH = require('./auth.js');
 var SERVER = require('./server.js');
 
@@ -135,9 +137,16 @@ var renderAndCopyFiles = function(packageDef, config, onDone) {
     return;
   }
   alterSourcePaths(packageDef.files);
-  FILES_TO_PROCESS = packageDef.files;
-  FILES_PROCESSED = [];
-  processFilesInQueue(config, onDone);
+  expandGlobs(packageDef.files, function(maps) {
+    FILES_TO_PROCESS = maps;
+    FILES_PROCESSED = [];
+    processFilesInQueue(config, onDone);
+  });
+}
+
+var getPath = function(file) {
+  var slash = file.lastIndexOf('/');
+  return slash === -1 ? '' : file.substring(0, slash);
 }
 
 var renderFile = function(map, config, onDone) {
@@ -150,25 +159,27 @@ var renderFile = function(map, config, onDone) {
       try {
         rendered = EJS.render(data, config);
       } catch (e) {
-        console.log("Failed to render!" + e);
+        console.log("Failed to render " + map.from + "\n" + e);
         throw e; 
       }
-      FS.writeFile(map.to, rendered, function(err) {
-        if (err) {
-          console.log(JSON.stringify(err));
-          throw err;
-        }
-        onDone(map.to);
-      });
+      MKPATH(getPath(map.to), function(err) {
+        // Ignore EEXIST, writeFile will fail for other errs.
+        FS.writeFile(map.to, rendered, function(err) {
+          if (err) {throw err}
+          onDone(map.to);
+        });
+     });
     });
 }
 
 var copyFile = function(map, onDone) {
   FS.readFile(map.from, function(err, data) {
-    if (err) {throw err}
-    FS.writeFile(map.to, data, function(err) {
-      if (err) {throw err}
-      onDone(map.to);
+    MKPATH(getPath(map.to), function(err) {
+      // Ignore EEXIST, writeFile will fail for other errs.
+      FS.writeFile(map.to, data, function(err) {
+        if (err) {throw err}
+        onDone(map.to);
+      });
     });
   });
 }
@@ -181,20 +192,60 @@ var processFilesInQueue = function(config, onDone) {
     var onDoneWithFile = function(newFile) {
       FILES_PROCESSED.push(newFile);
       if (FILES_PROCESSED.length === FILES_TO_PROCESS.length) {
-        console.log('Created ' + FILES_PROCESSED + ' new files');
+        console.log('Created ' + FILES_PROCESSED.length + ' new files');
         onDone();
       }
     };
-    if (FILES_TO_PROCESS[i].method === 'render') {
-      renderFile(FILES_TO_PROCESS[i], config, onDoneWithFile);
-    } else {
-      copyFile(FILES_TO_PROCESS[i], onDoneWithFile);
+    try {
+      if (FILES_TO_PROCESS[i].method === 'render') {
+        renderFile(FILES_TO_PROCESS[i], config, onDoneWithFile);
+      } else {
+        copyFile(FILES_TO_PROCESS[i], onDoneWithFile);
+      }
+    } catch (e) {
+      console.log('error ' + FILES_TO_PROCESS[i].method + 'ing file ' + FILES_TO_PROCESS[i].from);
+      throw e;
     }
+  }
+}
+
+var expandGlobs = function(maps, onDone) {
+  var newMaps = [];
+  var numGlobbed = 0;
+
+  var gatherGlob = function(glob, onDone) {
+    GLOB(glob.from, {}, function(err, files) {
+      if (err) {throw err}
+      var globbed = [];
+      for (var i = 0; i < files.length; ++i) {
+        globbed.push({
+          from: files[i],
+          to: files[i].replace(SRC_DIR, DEST_DIR),
+          method: glob.method
+        });
+      }
+     onDone(globbed);
+    })
+  }
+
+  for (var i = 0; i < maps.length; ++i) {
+    gatherGlob(maps[i], function(results) {
+      newMaps = newMaps.concat(results);
+      if (++numGlobbed === maps.length) {
+        onDone(newMaps);
+      }
+    });
   }
 }
 
 var alterSourcePaths = function(maps) {
   for (var i = 0; i < maps.length; ++i) {
+    if (!maps[i].method) {
+      maps[i].method = 'render';
+    }
+    if (!maps[i].to) {
+      maps[i].to = maps[i].from;
+    }
     maps[i].from = SRC_DIR + '/' + maps[i].from;
   }
 }
@@ -206,7 +257,6 @@ var runForPackage = function(packageName, config, onDone) {
       if (err) {
         recursiveRmdir(SRC_DIR);
         if (err.code === 'EEXIST') {
-          console.log('Removed old ' + SRC_DIR);
           runForPackage(packageName, config, onDone);
           return true;
         } else {
@@ -279,22 +329,36 @@ exports.run = function(args) {
   if (!source || !config) {
     return true;
   }
-  FS.readFile(config, function(err, data) {
-    if (err) {
-      console.log('error reading from config:' + config);
-      throw err; 
-    }
-    try {
-      data = JSON.parse(data);
-    } catch (e) {
-      console.log('error parsing config JSON');
-      throw e;
-    }
-    if (runFromSource(source, data)) {
+
+  var parsed;
+  try {
+    parsed = JSON.parse(config);
+  } catch (e) {
+    // Ignore
+  }
+  if (parsed) {
+    if (runFromSource(source, parsed)) {
       console.log('Couldn\'t parse source:' + source);
       throw new Error();
     }
-  });
+  } else {
+    FS.readFile(config, function(err, data) {
+      if (err) {
+        console.log('error reading from config:' + config);
+        throw err; 
+      }
+      try {
+        data = JSON.parse(data);
+      } catch (e) {
+        console.log('error parsing config JSON:' + config);
+        throw e;
+      }
+      if (runFromSource(source, data)) {
+        console.log('Couldn\'t parse source:' + source);
+        throw new Error();
+      }
+    });
+  }
 }
 
 var runFromSource = function(source, config) {
