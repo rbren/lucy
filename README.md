@@ -14,6 +14,7 @@ https://github.com/joyent/node/wiki/installing-node.js-via-package-manager
 
 ```bash
 sudo npm install -g lucy
+lucy adduser
 ```
 <br><br>
 ## Usage
@@ -42,6 +43,24 @@ There are two main components to a lucy module:<br>
 Most users will simply run ```lucy build``` to generate code from an existing lucy package. However, you can also create your own definitions and packages to share with others. Let's walk through a "hello world" example.
 
 <i>Note that while we're in beta, the ```define``` and ```publish``` commands won't work unless you're signed up. Feel free to jump ahead to ```build``` though!</i>
+
+### Quickstart
+To download all the files described in this tutorial, enter a new directory and run
+```bash
+lucy build hello-world-starter '{"username": "SOME_UNIQUE_ID"}'
+```
+choosing a unique id that won't collide with other hello-world-* definitions.
+
+you can then run
+```bash
+lucy define def.json
+
+lucy publish pkg
+lucy build hello-world-YOUR_UNIQUE_ID:js config.json
+
+lucy publish javapkg
+lucy build hello-world-YOUR_UNIQUE_ID:java config.json
+```
 
 ### The Definition
 We start with a definition:

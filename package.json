@@ -1,7 +1,7 @@
 {
   "name": "lucy",
   "description": "Code templating and automation",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -11,7 +11,7 @@
     "url": "https://github.com/bobby-brennan/lucy.git"
   },
   "author": "Bobby Brennan",
-  "license": "ISC",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/bobby-brennan/lucy/issues"
   },
