@@ -48,10 +48,12 @@ exports.publish = function(email, password, pkgDef, tarball) {
        uri: LUCY_URL + '/publish',
        multipart: [{
              'content-type': 'application/json',
+             'Content-Disposition': 'form-data; name="body"; filename="body.json"',
              body: JSON.stringify(buildBody(email, password, pkgDef)),
        }, {
              'content-type': 'application/octet-stream',
-             body: tarball,
+             'Content-Disposition': 'form-data; name="tarball"; filename="contents.tgz"',
+             body: new Buffer(tarball, 'binary').toString('base64'),
        }]
   }, handleResponse());
 }
