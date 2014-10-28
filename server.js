@@ -48,10 +48,12 @@ exports.publish = function(email, password, pkgDef, tarball) {
        uri: LUCY_URL + '/publish',
        multipart: [{
              'content-type': 'application/json',
+             'Content-Disposition': 'form-data; name="body"; filename="body.json"',
              body: JSON.stringify(buildBody(email, password, pkgDef)),
        }, {
              'content-type': 'application/octet-stream',
-             body: tarball,
+             'Content-Disposition': 'form-data; name="tarball"; filename="contents.tgz"',
+             body: new Buffer(tarball, 'binary').toString('base64'),
        }]
   }, handleResponse());
 }
@@ -95,12 +97,10 @@ exports.getDefinition = function(email, password, defName, onDone) {
   }, true));
 }
 
-exports.getPackageAndDefinition = function(email, password, packageName, writeStream, onDone) {
-  var colon = packageName.indexOf(':');
-  var defn = packageName.substring(0, colon);
-  exports.getDefinition(email, password, defn, function(err, dRes) {
+exports.getPackageAndDefinition = function(email, password, def, pkg, writeStream, onDone) {
+  exports.getDefinition(email, password, def, function(err, dRes) {
     if (err) {return onDone(err)}
-    exports.getPackage(email, password, packageName, writeStream, function(err, pRes) {
+    exports.getPackage(email, password, def + ':' + pkg, writeStream, function(err, pRes) {
       return onDone(err, dRes);
     });
   });

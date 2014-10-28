@@ -31,8 +31,6 @@ var sendPackage = function(dir, email, password) {
       var tarCmd = 'tar czf ' + tarName + ' -C' + dir + '.';
       EXEC('tar czf ' + tarName + ' -C ' + dir + ' .', function(err, stdout, stderr) {
         if (err) {throw err}
-        var readStream = FS.createReadStream(tarName);
-        readStream.setEncoding('binary');
         FS.readFile(tarName, {encoding: 'binary'}, function(err, data) {
           if (err) {throw err}
           SERVER.publish(email, password, pkgDef, data);
