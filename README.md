@@ -151,3 +151,31 @@ public class Hello {
 ```
 <br><br>
 <a href="http://lucybot.github.io/blog/">Join the beta</a> if you're intersted in giving it a shot!
+<br><br>
+
+## Full JSON spec
+<i>definition.json</i>
+```js
+{
+  "name": "string", // A unique identifier for this definition, allowed chars are alphanumeric and '-'
+  "description": "string", // A human-readable description of what kind of code this definition should generate
+  "sample_input": {} // Arbitrary JSON. All packages associated with this definition should run without errors if given this as input, and all build inputs will be type-checked against it.
+}
+```
+<br><br>
+<i>package.json</i>
+```js
+{
+  "definition_name": "string", // The identifier specified in definition.json
+  "package_name": "string", // An identifier distinct from all other packages associated with this definition. Will default to definition_name if unspecified
+  "files": {  // The files to be generated
+    "from": "string", // The relative path (foo/bar.baz) or glob (foo/*) to read from inside the package directory
+    "to": "string", // The relative path of the file to write to in the destination directory. Defaults to "from"
+    "method": "string" // Either "render" (which fills out EJS templates) or "copy". Defaults to "render"
+  },
+  "js_scripts": [  // These scripts will be run in order after all files are generated.
+    "script1.js",
+    "script2.js"
+  ]
+}
+```
