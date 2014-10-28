@@ -157,9 +157,16 @@ public class Hello {
 <i>definition.json</i>
 ```js
 {
-  "name": "string", // A unique identifier for this definition, allowed chars are alphanumeric and '-'
-  "description": "string", // A human-readable description of what kind of code this definition should generate
-  "sample_input": {} // Arbitrary JSON. All packages associated with this definition should run without errors if given this as input, and all build inputs will be type-checked against it.
+   // name: A unique identifier for this definition.
+   // Allowed chars are alphanumeric and '-'
+  "name": "string",
+  // description: A human-readable description of what
+  // kind of code this definition should generate
+  "description": "string",
+  // sample_input: Arbitrary JSON. All packages associated
+  // with this definition must run without errors if given this
+  // as input, and all build inputs will be type-checked against it.
+  "sample_input": {}
 }
 ```
 <br><br>
